@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Parking-Now</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./conductores.css">  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="./conductores.js"></script>
+  <script src="./modelomarca.js"></script>  
+</head>
+
+<body onload = "ag()">
+<h1><strong>Bienvenido a Parking-Now</strong></h1>
+
+<div class="container-fluid">
+         <div class="row">
+                <div class="col d-flex justify-content-center">
+                        <div style="max-width: 450px">
+                                <p class="text-white" style="text-align: justify; border-bottom: 1px solid grey; border-top: 1px solid grey">
+                                Por favor, completa el siguiente formulario con tus datos personales, 
+                                tal cual figuran en tu DNI o licencia de conducir.</p>
+                        </div>
+                </div><br>
+        </div>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">            
+             <div class="d-flex justify-content-center">
+                  <form action="../tmp/ConductoresRegistro/nuevoConductor.php" id="f1" method="post" class="was-validated" 
+                  onchange="todoOk()" style="width: 300px" autocomplete="off">
+                         <div id="form1" style="height: 440px">   
+                            <div class="form-group">
+                                    <label for="nombre" style="color: white">Ingresa tu nombre completo:</label>                                   
+                                    <input type="text" name="nombre" id="nombre" class="form-control" pattern="[A-Za-z\s]{2,}"
+                                     title="Debe contener al menos dos letras de la A a la Z en minúscula o mayúscula." 
+                                     onfocus="valmje('enom')" onblur="borrarvalmje('enom')" required>
+                                    <div class="valid-feedback">Parece correcto!</div>
+                                    <div class="invalid-feedback text-warning" id="enom"></div>                                    
+                            </div>
+                    <div class="form-group">
+                                      <label for="apellido" style="color: white">Ingresa tu apellido:</label>
+                                      <input type="text" name="apellido" id="apellido" class="form-control" pattern="[A-Za-z\s]{2,}" 
+                                       title="Debe contener al menos dos letras de la A a la Z en minúscula o mayúscula." 
+                                       onfocus="valmje('eap')" onblur="borrarvalmje('eap')" required>
+                                      <div class="valid-feedback">Parece correcto!</div>
+                                      <div class="invalid-feedback text-warning" id="eap"></div>
+                    </div>
+                    <div class="form-group">                    
+                                    <label for="patente" style="color: white">Ingresa la patente de tu automóvil:</label>
+                                    <input type="text" name="patente" id="patente" class="form-control" 
+                                    pattern="(([A-Z]{3})+([0-9]{3})|([A-Z]{2})+([0-9]{3})+([A-Z]{2}))" 
+                                    title="Debe contener 6 o 7 caracteres en total. Las letras deben ser en Mayúscula y no debe tener 
+                                    espacios." 
+                                    placeholder="Por ejemplo: ABC222 o AB555CD" onfocus=
+                                    "valmje('epat',this.title)" onblur="borrarvalmje('epat')"required>
+                                    <div class="valid-feedback">Parece correcto!</div>
+                                    <div class="invalid-feedback text-warning" id='epat'></div>
+                    </div>
+                    <div class="form-group">
+                                    <label for="email" style="color: white">Ingresa tu E-mail:</label>
+                                    <input type="text" name="email" id="email" class="form-control" 
+                                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z.+-]{2,}$" 
+                                    title="Debes ingresar un email válido para confirmar tu cuenta." placeholder=
+                                    "ejemplo@ejemplo.com" onfocus="valmje('eema',this.title)" onblur="borrarvalmje('eema')" 
+                                      required>
+                                    <div class="valid-feedback">Parece correcto!</div>
+                                    <div class="invalid-feedback text-warning" id="eema"></div>
+                    </div><br>
+                    </div>
+                     
+                  
+                  <div id="form2" style="display: none">
+                          <div style="height: 410px">
+                            <div class="form-group">
+                                    <label for="pas" style="color: white">Ingresa tu contraseña:</label>                                   
+                                    <input type="password" name="pas" id="pas" class="form-control" pattern="(?=.*\d)(?=.*[a-z]).{5,8}"
+                                     title="Debe contener entre 5 y 8 caracteres y estar formado por lo menos por una letra y un número." 
+                                     onfocus="valmje('epas',this.title)" onblur="borrarvalmje('epas')" onkeyup="controlpas()" 
+                                      required>
+                                    <div class="valid-feedback">Parece correcto!</div>
+                                    <div class="invalid-feedback text-warning" id="epas"></div>                                    
+                            </div>
+                    <div class="form-group">
+                                      <label for="pasc" style="color: white">Confirma tu contraseña:</label>
+                                      <input type="password" name="pasc" id="pasc" class="invalido"  
+                                       title="Las contraseñas no coinciden." 
+                                       onfocus="valmje('epasc', this.title)" onkeyup="control(this.value)" onblur="borrarvalmje('epasc')" 
+                                       pattern="(?=.*\d)(?=.*[a-z]).{5,8}" required>
+                                      <div id="validomje" style="display: none">La contraseña coincide!</div>
+                                      <div class="text-warning" id="invalidomje"></div>
+                    </div>
+                    <div class="form-group">                    
+                                    <label for="marca" style="color: white">Ingresa la marca de tu automóvil:</label>
+                                    <input list="datamodelo" name="marca" id="marca" class="form-control"
+                                    title="Selecciona un modelo de la lista."  onfocus=
+                                    "valmje('epat',this.title)" onblur="borrarvalmje('epat'); 
+                                    cargarmarca(this.value)"required><datalist id="datamodelo"></datalist>
+
+                                    <div class="invalid-feedback text-warning" id='epat'></div>
+                    </div>
+                    <div class="form-group">
+                                    <label for="modelo" style="color: white">Modelo:</label>
+                                    <input list="modeloano" name="modelo" id="modelo" class="form-control" 
+                                    title="Ingresa el modelo de tu auto." onfocus="valmje('emod',this.title)" onblur="borrarvalmje('emod')" 
+                                    placeholder="Ingresa o tipea el modelo" required><datalist id="modeloano"></datalist>
+                                    <div class="invalid-feedback text-warning" id="emod"></div>
+                    </div>
+                   </div> 
+                    <button class="btn btn-primary" onClick="backform()" style="width: 300px">Volver</button>
+                  </div>
+                
+                <br>
+                <button class="btn btn-primary" onClick="nextform(1)" 
+                  style="width: 300px" id="siguiente">Siguiente</button>
+                <button class="btn btn-primary" type="submit" 
+                  style="width: 300px; display: none" id="envio">Enviar</button><br><br>
+                 </form>
+                 </div>
+            
+            </div>
+            <div class="col-sm-4"></div>
+      </div>
+              
+</div>
+
+</body>
+</html>

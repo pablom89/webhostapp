@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Parking-Now</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="playaregistro.css">  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="playaregistro.js"></script>
+  <style>
+  
+  @media screen and (min-width: 1450px) {
+
+  #col1{
+      width:33.3333%;
+  }
+  #col2{
+      width:33.3333%;
+  }
+  #col3{
+      width:33.3333%;
+  }
+}
+ 
+ @media screen and (min-width: 1100px) and (max-width: 1450px) {
+
+     #col1{
+      width:50%;
+  }
+  #col2{
+      width:48%;
+
+  }
+  #col3{
+      width:100%;
+      margin-top:35px;
+      border-top: 1px solid white;
+      border-bottom: 1px solid white;
+  }
+ }
+  
+      #gmap{
+        height:440px;
+        width: 100%;
+}
+
+  @media screen and (max-width: 1100px) {
+
+     #col1{
+      width:100%;
+  }
+  #col2{
+      width:90%;
+      margin-left:5%;
+
+  }
+  #col3{
+      width:100%;
+      margin-top:35px;
+      border-top: 1px solid white;
+      border-bottom: 1px solid white;
+  }
+ }
+  
+      #gmap{
+        height:440px;
+        width: 100%;
+}
+
+input::placeholder {
+  color: peachpuff;
+  font-size: 80%;
+}
+     
+  </style>
+  <script type="text/javascript">
+
+         var latitud;
+         var longitud;
+         var place;
+         
+         function tipov(obj,x){
+             if(obj.checked){
+                 document.getElementById(x).style.display = "block";
+             }else{
+                 document.getElementById(x).style.display = "none";
+             }
+         }
+         
+         function tipovm(obj){
+             if(obj.checked){
+                 document.getElementById("vha").style.display = "none";
+                 document.getElementById("pha").style.display = "none";
+                 document.getElementById("vhm").style.display = "none";
+                 document.getElementById("phm").style.display = "none";
+                 document.getElementById("vhp").style.display = "none";
+                 document.getElementById("php").style.display = "none";
+                 document.getElementById("vhb").style.display = "none";
+                 document.getElementById("phb").style.display = "none";
+                document.getElementById('vha').value = 0;
+                document.getElementById('vhm').value = 0;
+                document.getElementById('vhp').value = 0;
+                document.getElementById('vhb').value = 0;
+             }else{
+                 document.getElementById("vha").style.display = "block";
+                 document.getElementById("pha").style.display = "block";
+                 document.getElementById("vhm").style.display = "block";
+                 document.getElementById("phm").style.display = "block";
+                 document.getElementById("vhp").style.display = "block";
+                 document.getElementById("php").style.display = "block";
+                 document.getElementById("vhb").style.display = "block";
+                 document.getElementById("phb").style.display = "block";                 
+             }
+         }
+
+  $(document).ready(function() {
+
+
+      $('#enviar').click(function(e){
+        e.preventDefault();
+
+
+        var dir = $("#dir").val();
+       
+
+
+        $.ajax({
+            type: "POST",
+            url: "../park.php",
+            dataType: "json",
+            data: {dir:dir},
+            success : function(data){
+                if (data.code == "200"){
+                    //alert("Success: " +data.msg.latitud+" "+data.msg.longitud+" "+data.msg.ad+" "+data.msg.pi);
+                    document.getElementById('location').innerHTML = data.msg.ad;
+                    ya(data.msg.latitud, data.msg.longitud,0,1);
+                               latitud = data.msg.latitud;
+                               longitud = data.msg.longitud;
+                               place = data.msg.pi;
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+
+      });
+  });
+  
+  function geocodeLatLng(geocoder, map,latitud,longitud) {
+      var latlng = {lat: latitud, lng: longitud};
+      geocoder.geocode({'location': latlng}, function(results, status) {
+      if (status === 'OK') {
+          if (results[0]) {
+            document.getElementById('location').innerHTML = results[0].formatted_address;
+            alert(results[0].place_id);
+            place = results[0].place_id;
+          } else {
+            alert('No results found');
+          }
+        } else {
+          alert('Geocoder failed due to: ' + status);
+        }
+  });
+}
+
+function ya(latitud,longitud,z,f) {
+    
+      var options = {
+         zoom: 15,
+         center: new google.maps.LatLng(latitud, longitud),
+         mapTypeId: google.maps.MapTypeId.ROADMAP,
+         mapTypeControl: false,
+      };
+      
+      if(f==2){
+      var geocoder = new google.maps.Geocoder;
+      geocodeLatLng(geocoder, map, latitud, longitud);
+      }
+      
+         map = new google.maps.Map(document.getElementById("gmap"), options);
+         var marker = new google.maps.Marker({
+         map: map,
+         position: new google.maps.LatLng(latitud, longitud),
+         draggable: true         
+         });
+      
+         google.maps.event.addListener(marker, "dragend", function () {
+           var pos= marker.getPosition();
+          //alert('soltado en LAT:'+pos.lat()+'LON:'+pos.lng());
+          ya(pos.lat(),pos.lng(),3,2);
+          global(pos.lat(),pos.lng());
+         });
+      }
+        function global(lat,lon){
+            latitud=lat;
+            longitud=lon;
+        }
+        
+        function nuevaplaya(){
+                        //alert(latitud+" "+longitud);
+                        var lat = latitud;
+                        var lon = longitud;
+                        var pl = place;
+                        var reg = /[A-Za-z\s]{2,}/;
+                        var reg2 = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z.+-]{2,}$/;
+                        var reg3 = /(?=.*\d)(?=.*[a-z]).{5,8}/;
+                        var con = document.getElementById("pas").value;
+                        var con2 = document.getElementById("pasc").value;
+                        var n = document.getElementById("nombre").value;
+                        var em = document.getElementById("email").value;
+                        var solom = document.getElementById("solomensual").checked;
+                        var a24h =  document.getElementById("a24h").checked;
+                        var auto =  document.getElementById("auto").checked;
+                        var moto = document.getElementById("moto").checked;
+                        var pick_up = document.getElementById("pick_up").checked;
+                        var bici = document.getElementById("bici").checked;
+                        var vha = document.getElementById("vha").value;
+                        var vma = document.getElementById("vma").value;
+                        var vhm = document.getElementById("vhm").value;
+                        var vmm = document.getElementById("vmm").value;
+                        var vhp = document.getElementById("vhp").value;
+                        var vmp = document.getElementById("vmp").value;
+                        var vhb = document.getElementById("vhb").value;
+                        var vmb = document.getElementById("vmb").value;
+                        var techado = document.getElementById("techado").checked;
+                        var seguro = document.getElementById("seguro").checked;
+                        var ha = document.getElementById("ha").value;
+                        var hc = document.getElementById("hc").value;
+                        alert(vha);
+                        
+                        if(reg.test(n) && reg2.test(em) && reg3.test(con) && (con2===con) && (lat !== undefined && lat !== '') && (lon !== undefined && lon !== '') && (auto === true || moto === true || pick_up === true || bici === true) && (((vha !=='' && vma !== '') || (solom === true && vma!=='')) || ((vhm !=='' && vmm !== '') || (solom === true && vmm!=='')) || ((vhp !=='' && vmp !== '') || (solom === true && vmp!=='')) || ((vhb !=='' && vmb !== '') || (solom === true && vmb!==''))) && ((solom === true) ||(a24h === true) || (solom === false && a24h === false && ha !== '' && hc !== '')) ){
+                                document.getElementById("envio").style.backgroundColor = "rgba(0,100,0,0.9)";
+                                document.getElementById("envio").style.borderColor = "green";
+                                
+                                  var xhttp = new XMLHttpRequest();
+                                  xhttp.onreadystatechange = function() {
+                                  if (this.readyState == 4 && this.status == 200) {
+                                  console.log(this.responseText);
+                                     }
+                                     console.log(this.responseText);
+                                  }
+                                  xhttp.open("POST", "nuevaPlaya.php", true);
+                                  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                                  xhttp.send("latitud="+lat+"&longitud="+lon+"&nombre="+n+"&place="+pl+"&email="+em+"&contra="+con+"&vha="+vha+"&vma="+vma+"&vhm="+vhm+"&vmm="+vmm+"&vhp="+vhp+"&vmp="+vmp+"&vhb="+vhb+"&vmb="+vmb+"&ha="+ha+"&hc="+hc+"&auto="+auto+"&moto="+moto+"&pick_up="+pick_up+"&bici="+bici+"&techado="+techado+"&solom="+solom+"&seguro="+seguro+"&a24h="+a24h);
+                                
+                        }
+                        
+  }
+      
+
+</script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDrQIu0qaEDTCx5y-jCru-VNxP61yfsdJo"></script>
+</head>
+
+<body onload="ya(-31.41823194903026,-64.19009213359374,0,0)">
+<h1><strong>Bienvenido a Parking-Now</strong></h1>
+
+<div class="container-fluid">
+         <div class="row">
+                <div class="col d-flex justify-content-center" style=" border-bottom: 1px solid grey; border-top: 1px solid grey;">
+                        <div style="max-width: 450px">
+                                <div class="text-white" style="text-align: justify;">
+                                Por favor, completa los siguientes datos: 
+                                </div>
+                        </div>
+                </div><br>
+        </div>
+        <div class="row">
+            <div id="col1" class="mb-5">
+            <div class="d-flex justify-content-center">
+                    <form action="../nuevaPlaya.php" method="post" class="was-validated mt-4" 
+                   style="width: 400px" autocomplete="off">
+                         <div style="height:490px">   
+                            <div class="form-group">
+                                    <label for="nombre" style="color: white">Ingresa el nombre de fantasia:</label>                                   
+                                    <input type="text" name="nombre" id="nombre" class="form-control" pattern="[A-Za-z\s]{2,}"
+                                     title="Debe contener al menos dos letras de la A a la Z en minúscula o mayúscula." 
+                                     onfocus="valmje('enom')" onblur="borrarvalmje('enom')" placeholder="Estacionamiento 'Juan Perez'" required>
+                                    <div class="valid-feedback">Parece correcto!</div>
+                                    <div class="invalid-feedback text-warning" id="enom"></div>                                     
+                            </div>
+                            
+                            <div class="form-group">
+                                    <label for="email" style="color: white">Ingresa tu E-mail:</label>
+                                    <input type="text" name="email" id="email" class="form-control" 
+                                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z.+-]{2,}$" 
+                                    title="Debes ingresar un email válido para confirmar tu cuenta." placeholder=
+                                    "ejemplo@ejemplo.com" onfocus="valmje('eema',this.title)" onblur="borrarvalmje('eema')" 
+                                      required>
+                                    <div class="valid-feedback">Parece correcto!</div>
+                                    <div class="invalid-feedback text-warning" id="eema"></div>
+                    </div>
+                                                <div class="form-group">
+                                    <label for="pas" style="color: white">Ingresa tu contraseña:</label>                                   
+                                    <input type="password" name="pas" id="pas" class="form-control" pattern="(?=.*\d)(?=.*[a-z]).{5,8}"
+                                     title="Debe contener entre 5 y 8 caracteres y estar formado por lo menos por una letra y un número." 
+                                     onfocus="valmje('epas',this.title)" onblur="borrarvalmje('epas')" onkeyup="controlpas()" 
+                                      required>
+                                    <div class="valid-feedback">Parece correcto!</div>
+                                    <div class="invalid-feedback text-warning" id="epas"></div>                                    
+                            </div>
+                    <div class="form-group">
+                                      <label for="pasc" style="color: white">Confirma tu contraseña:</label>
+                                      <input type="password" name="pasc" id="pasc" class="invalido"  
+                                       title="Las contraseñas no coinciden." 
+                                       onfocus="valmje('epasc', this.title)" onkeyup="control(this.value)" onblur="borrarvalmje('epasc')" 
+                                       pattern="(?=.*\d)(?=.*[a-z]).{5,8}" required>
+                                      <div id="validomje" style="display: none">La contraseña coincide!</div>
+                                      <div class="text-warning" id="invalidomje"></div>
+                    </div>
+                    <div class="mr-sm-2 custom-control custom-checkbox">
+                <input onChange="comprobando(this); tipovm(this);" type="checkbox" class="custom-control-input" id="solomensual" name="solomensual">
+                <label class="custom-control-label text-white" id="isolomen" for="solomensual">Modalidad de cobro solo mensual.</label>
+             </div>
+             <div class="d-flex mt-2 justify-content-around align-items-center">
+                 <div style="height:80px;" class="d-flex-column align-items-start ml-1 mt-1">
+                 <div class="d-flex justify-content-around">
+                 <label for="ha" class="mr-sm-2 mt-2 text-white"><b>Apertura:</b></label>
+                 <input type="time" style="width:150px" class="form-control form-control-sm mr-2" id="ha" name="ha" min="0" max="999.99">
+                 </div>
+                 <div class="d-flex justify-content-around">
+                 <label for="hc" class="mr-auto mt-2 text-white"><b>Cierre:</b></label>
+                 <input type="time" style="width:150px" class="form-control form-control-sm mr-2 mt-2" id="hc" name="hc" min="0" max="999.99">
+                 </div>
+             </div>
+             <div class="mr-2 custom-control custom-checkbox">
+                <input onChange="comprobando1(this)" type="checkbox" class="custom-control-input" id="a24h" name="a24h">
+                <label class="custom-control-label text-white" for="a24h" id="24horas"><b>Abierto 24hs</b></label>
+             </div>
+             </div>
+                    </div>
+                  </form>
+            </div>
+            </div>
+            <div id="col2" class="mt-4">            
+             <div class="d-flex-column justify-content-center">
+                  <form  method="post" class="mt-4" 
+                  onchange="todoOk()"  autocomplete="off" style="width: 100%">
+                          <div id="barra" class="container-fluid p-0">
+             <div class="row bg-dark no-gutters">       
+                        <div class="col">  
+                              <input type='text' id="dir" style="border-radius: 0px;" class="form-control" placeholder='Ingresa la dirección de la playa o mueve el marcador en el mapa' />
+                        </div>
+                   <button id="enviar" class="btn btn-success" style="border-radius: 0px; border-color:black;">Localizar</button>
+</div>
+ </div>
+<div class="bg-success" style="z-index:1;" id="gmap">Cargando mapa...</div>
+      
+                 </form>
+                 <div class="text-white">La dirección ingresada es:<span id="location" class="ml-1 mb-2 text-white"></span></div>
+                 </div>
+            
+            </div>
+            <div id="col3">
+                <div class="d-flex justify-content-center">
+                <div style="width: 500px;">    
+                <div class="text-white mt-4 ml-4" style="max-width:500px;">Selecciona los vehículos permitidos:</div>
+                <div class="d-flex-column mt-2 mb-1" style="max-width:500px;">
+                    <div class="d-flex justify-content-center align-items-center" style="height: 80px;">
+                        <div class="d-flex justify-content-between align-items-center" style="width:72%;">
+                        <div class="mt-3 custom-control custom-checkbox">
+                            <input type="checkbox" onChange="tipov(this,'autoinfo')" class="custom-control-input" id="auto" name="auto">
+                            <label class="custom-control-label text-white" for="auto"><b>Auto</b></label>
+                        </div>
+                        <div id="autoinfo" style="display:none">
+                        <div class="d-flex-column ml-5">
+                        <div class="d-flex mt-3 justify-content-around"> 
+                             <label for="vh" class="mr-2 text-white" id="pha"><b>Precio por hora:</b></label>
+                             <input type="number" style="width:60px" class="form-control form-control-sm mr-2" id="vha" name="vh" min="0" max="999">
+                        </div>
+                        <div class="d-flex justify-content-around mt-2">
+                             <label for="vm" class="mr-2 text-white"><b>Precio por mes:</b></label>
+                             <input type="number" style="width:70px" class="form-control form-control-sm mr-2" id="vma" name="vm" min="0" max="9999">
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center mt-2" style="height: 80px;">
+                        <div class="d-flex justify-content-between align-items-center" style="width:72%;">
+                        <div class="mr-2 mt-3 custom-control custom-checkbox">
+                            <input type="checkbox" onChange="tipov(this,'motoinfo')" class="custom-control-input" id="moto" name="moto">
+                            <label class="custom-control-label text-white" for="moto"><b>Moto</b></label>
+                        </div>
+                        <div id="motoinfo" style="display:none">
+                        <div class="d-flex-column ml-5">
+                        <div class="d-flex mt-3 justify-content-around"> 
+                             <label for="vh" class="mr-2 text-white" id="phm"><b>Precio por hora:</b></label>
+                             <input type="number" style="width:60px" class="form-control form-control-sm mr-2" id="vhm" name="vh" min="0" max="999">
+                        </div>
+                        <div class="d-flex justify-content-around mt-2">
+                             <label for="vm" class="mr-2 text-white"><b>Precio por mes:</b></label>
+                             <input type="number" style="width:70px" class="form-control form-control-sm mr-2" id="vmm" name="vm" min="0" max="9999">
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                      <div class="d-flex justify-content-center align-items-center mt-2" style="height: 80px;">
+                          <div class="d-flex justify-content-between align-items-center" style="width:72%;">
+                        <div class="mr-2 mt-3 custom-control custom-checkbox">
+                            <input type="checkbox" onChange="tipov(this,'pick-upinfo')" class="custom-control-input" id="pick_up" name="pick_up">
+                            <label class="custom-control-label text-white" for="pick_up"><b>Pick-up</b></label>
+                        </div>
+                        <div id="pick-upinfo" style="display:none">
+                        <div class="d-flex-column ml-5">
+                        <div class="d-flex mt-3 justify-content-around"> 
+                             <label for="vh" class="mr-2 text-white" id="php"><b>Precio por hora:</b></label>
+                             <input type="number" style="width:60px" class="form-control form-control-sm mr-2" id="vhp" name="vh" min="0" max="999">
+                        </div>
+                        <div class="d-flex justify-content-around mt-2">
+                             <label for="vm" class="mr-2 text-white"><b>Precio por mes:</b></label>
+                             <input type="number" style="width:70px" class="form-control form-control-sm mr-2" id="vmp" name="vm" min="0" max="9999">
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center mt-2" style="height: 80px;">
+                        <div class="d-flex justify-content-between align-items-center" style="width:72%;">
+                        <div class="mr-2 mt-3 custom-control custom-checkbox">
+                            <input type="checkbox" onChange="tipov(this,'biciinfo')" class="custom-control-input" id="bici" name="bici">
+                            <label class="custom-control-label text-white" for="bici"><b>Bicicleta</b></label>
+                        </div>
+                        <div id="biciinfo" style="display:none">
+                        <div class="d-flex-column ml-5">
+                        <div class="d-flex mt-3 justify-content-around"> 
+                             <label for="vh" class="mr-2 text-white" id="phb"><b>Precio por hora:</b></label>
+                             <input type="number" style="width:60px" class="form-control form-control-sm mr-2" id="vhb" name="vh" min="0" max="999">
+                        </div>
+                        <div class="d-flex justify-content-around mt-2">
+                             <label for="vm" class="mr-2 text-white"><b>Precio por mes:</b></label>
+                             <input type="number" style="width:70px" class="form-control form-control-sm mr-2" id="vmb" name="vm" min="0" max="9999">
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="ml-4" style="max-width:500px;">
+                        <div class="text-white mt-4">Información adicional:</div>
+                        <div class="d-flex mt-2">
+                                        <div class="mr-2 custom-control custom-checkbox d-flex justify-content-start">
+                                                <input type="checkbox" class="custom-control-input" id="techado" name="techado">
+                                                <label class="custom-control-label text-white" for="techado"><b>Techada / Cubierta</b></label>
+                                        </div>
+                                         <div class="mr-2  ml-4 mb-3 custom-control custom-checkbox d-flex justify-content-start">
+                                            <input type="checkbox" class="custom-control-input" id="seguro" name="seguro">
+                                            <label class="custom-control-label text-white" for="seguro"><b>Con seguro</b></label>
+                                         </div>
+                                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+      </div>
+      <div class="row mt-3 mb-1"><button onclick="nuevaplaya()" class="btn btn-primary mx-auto" style="width: 200px" type="submit" id="envio">Enviar</button><br><br></div>
+              
+</div>
+
+</body>
+</html>
+

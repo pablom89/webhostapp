@@ -1,0 +1,12 @@
+{
+    "name": "usuario/parkingnow",
+    "require": {
+        "wisembly/elephant.io": "^3.3"
+    },
+    "authors": [
+        {
+            "name": "pablo m.",
+            "email": "pablo_89_cba@hotmail.com"
+        }
+    ]
+}

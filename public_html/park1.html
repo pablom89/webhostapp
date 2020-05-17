@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Parking-Now</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+  <script>
+
+ var haylugar;
+ var socket = io.connect("https://parkingnow.herokuapp.com/");
+ socket.on("new_order", function (data){
+	
+		console.log(data.test2);
+		if(haylugar === undefined){
+		   document.getElementById("lug").innerHTML = "¡Hay lugar!";
+		   document.getElementById("lug").style.color = "green";
+		   haylugar = 1;
+		   alert(haylugar);
+		}else if(haylugar == 1){
+		document.getElementById("lug").innerHTML = "¡No hay lugar!";
+		document.getElementById("lug").style.color = "red";
+		haylugar = 0;
+		}else{
+		    document.getElementById("lug").innerHTML = "¡Hay lugar!";
+		    document.getElementById("lug").style.color = "green";
+		    haylugar = 1;
+		}
+  })
+</script>
+<style>
+
+html,body{
+   height :100%;
+   padding: 0px;
+   margin: 0px;
+   display: flex;
+   flex-direction: column;
+}
+
+
+.close {position:relative;}
+.close .cerrar {
+    background:url(cancel.png) no-repeat;
+    width:26px;height:26px;
+    top:0px;
+    right:0px;
+    position:absolute;
+    cursor:pointer;
+    z-index:4;
+}
+
+#infodet{
+  color: black;
+  background-color: white;
+}
+
+
+
+#barra{
+  height: auto;
+}
+
+#gmap{
+        height:90%;
+        width: 100%;
+}
+
+
+</style>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+<script type="text/javascript">
+
+          var latitud;
+          var longitud;
+          
+          var formatNumber = {
+ separador: ".", // separador para los miles
+ sepDecimal: ',', // separador para los decimales
+ formatear:function (num){
+ num +='';
+ var splitStr = num.split('.');
+ var splitLeft = splitStr[0];
+ var splitRight = splitStr.length > 1 ? this.sepDecimal + splitStr[1] : '';
+ var regx = /(\d+)(\d{3})/;
+ while (regx.test(splitLeft)) {
+ splitLeft = splitLeft.replace(regx, '$1' + this.separador + '$2');
+ }
+ return this.simbol + splitLeft +splitRight;
+ },
+ new:function(num, simbol){
+ this.simbol = simbol ||'';
+ return this.formatear(num);
+ }
+}
+
+  $(document).ready(function() {
+
+
+      $('#enviar').click(function(e){
+        e.preventDefault();
+
+
+        var dir = $("#dir").val();
+       
+
+
+        $.ajax({
+            type: "POST",
+            url: "park.php",
+            dataType: "json",
+            data: {dir:dir},
+            success : function(data){
+                if (data.code == "200"){
+                    alert("Success: " +data.msg.latitud+" "+data.msg.longitud+ " " +data.msg.pi);
+                    ya(data.msg.latitud, data.msg.longitud,3,1);
+                              var latitud = data.msg.latitud;
+                              var longitud = data.msg.latitud;
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+
+
+      });
+  });
+  
+  var fil=0;
+  
+  function motoinfo(){
+      document.getElementById("motoinfo").style.display="block";
+      document.getElementById("autoinfo").style.display="none";
+  }
+  
+  function comprobando4(obj){
+     if (obj.checked){
+            document.getElementById('ha').disabled = true;
+            document.getElementById('hc').disabled = true;
+            document.getElementById('a24h').disabled = true;
+            document.getElementById('v12h').disabled = true;
+            document.getElementById('v24h').disabled = true;
+            document.getElementById('vh').disabled = true;
+            document.getElementById('vm').disabled = true;
+            document.getElementById('solomen').disabled = true;
+            document.getElementById('techado').disabled = true;
+            document.getElementById('seguro').disabled = true;
+            document.getElementById('a24h').checked = false;
+     }else{
+            document.getElementById('ha').disabled = false;
+            document.getElementById('hc').disabled = false;
+            document.getElementById('a24h').disabled = false;
+            document.getElementById('v12h').disabled = false;
+            document.getElementById('v24h').disabled = false;
+            document.getElementById('vh').disabled = false;
+            document.getElementById('vm').disabled = false;
+            document.getElementById('solomen').disabled = false;
+            document.getElementById('techado').disabled = false;
+            document.getElementById('seguro').disabled = false;
+         
+     }
+  }
+  function comprobando2(obj){
+      var s = document.getElementById('seguro').checked;
+      var a24 = document.getElementById('a24h').checked;
+      var sm = document.getElementById('solomen').checked;
+      if (obj.checked && s==false && a24==false && sm==false){
+            document.getElementById('gra').disabled = true;
+        }else if(!obj.checked && ( s==true || a24==true || sm==true)){
+            document.getElementById('gra').disabled = true;
+        }else if(!obj.checked){
+            document.getElementById('gra').disabled = false;
+        }
+  }
+  function comprobando3(obj){
+      var t = document.getElementById('techado').checked;
+      var a24 = document.getElementById('a24h').checked;
+      var sm = document.getElementById('solomen').checked;
+      if (obj.checked && t==false && a24==false && sm==false){
+            document.getElementById('gra').disabled = true;
+        }else if(!obj.checked && ( t==true || a24==true || sm==true)){
+            document.getElementById('gra').disabled = true;
+        }else if(!obj.checked){
+            document.getElementById('gra').disabled = false;
+        }
+  }
+  function comprobando1(obj, i) {
+        if (obj.checked && i==1){
+            document.getElementById('pick').disabled = true;
+            document.getElementById('moto').disabled = true;
+            document.getElementById('bici').disabled = true;
+        }else if(obj.checked && i==2){
+            document.getElementById('auto').disabled = true;
+            document.getElementById('moto').disabled = true;
+            document.getElementById('bici').disabled = true; 
+        }else if(!obj.checked && i==1){
+            document.getElementById('pick').disabled = false;
+            document.getElementById('moto').disabled = false;
+            document.getElementById('bici').disabled = false; 
+        }else if(!obj.checked && i==2){
+             document.getElementById('auto').disabled = false;
+            document.getElementById('moto').disabled = false;
+            document.getElementById('bici').disabled = false; 
+        }else if(obj.checked && i==3){
+             document.getElementById('auto').disabled = true;
+            document.getElementById('pick').disabled = true;
+            document.getElementById('bici').disabled = true; 
+        }else if(!obj.checked && i==3){
+             document.getElementById('auto').disabled = false;
+            document.getElementById('pick').disabled = false;
+            document.getElementById('bici').disabled = false; 
+        }else if(obj.checked && i==4){
+             document.getElementById('auto').disabled = true;
+            document.getElementById('moto').disabled = true;
+            document.getElementById('pick').disabled = true; 
+        }else{
+             document.getElementById('auto').disabled = false;
+            document.getElementById('moto').disabled = false;
+            document.getElementById('pick').disabled = false; 
+        }
+  }
+  //1 solo men
+  function comprobando(obj, i) {
+      var t = document.getElementById('techado').checked;
+      var s = document.getElementById('seguro').checked;
+
+        if (obj.checked && i==1){
+            document.getElementById('ha').disabled = true;
+            document.getElementById('hc').disabled = true;
+            document.getElementById('a24h').disabled = true;
+            document.getElementById('haylugar').disabled = false;
+            document.getElementById('v12h').disabled = true;
+            document.getElementById('v24h').disabled = true;
+            document.getElementById('vh').disabled = true;
+            document.getElementById('a24h').checked = false;
+            if(s==false && t==false){
+                document.getElementById('gra').disabled = true; 
+            }
+        }else if(obj.checked && i!=1){
+            document.getElementById('ha').disabled = true;
+            document.getElementById('hc').disabled = true;
+            document.getElementById('solomen').checked = false;
+            document.getElementById('solomen').disabled = true;
+            if(s==false && t==false){
+                document.getElementById('gra').disabled = true;
+            }
+        }else if(!obj.checked && i==1){
+            document.getElementById('ha').disabled = false;
+            document.getElementById('hc').disabled = false;
+            document.getElementById('a24h').disabled = false;
+            document.getElementById('haylugar').disabled = true;
+            document.getElementById('v12h').disabled = false;
+            document.getElementById('v24h').disabled = false;
+            document.getElementById('vh').disabled = false;
+            document.getElementById('haylugar').checked = false;
+            if(s==true || t==true){
+                document.getElementById('gra').disabled = true; 
+            }else{
+                document.getElementById('gra').disabled = false;
+            }
+        }else{
+            document.getElementById('ha').disabled = false;
+            document.getElementById('hc').disabled = false;
+            document.getElementById('solomen').disabled = false;
+            if(s==true || t==true){
+                document.getElementById('gra').disabled = true; 
+            }else{
+                document.getElementById('gra').disabled = false;
+            }
+        }
+    }
+  
+  function cerrarinfowindow(){
+      document.getElementById("infowindow").style.display = "none";
+  }
+  
+  function infowindow(x){
+      document.getElementById("infowindow").style.display = "block";
+      document.getElementById("nombreinfo").innerHTML = myObj[x].nombre;
+      var distancia;
+      if(myObj[x].distance>1){
+          d = myObj[x].distance*1;
+          distancia = "A " + d.toFixed(2) + " km de tu destino";
+      }else{
+        d = myObj[x].distance*1000;   
+        distancia = "A " + d.toFixed() + " metros de tu destino";
+      }
+      document.getElementById("dis").innerHTML = distancia;
+      document.getElementById("vhinfo").innerHTML = formatNumber.new(myObj[x].vh, "$ ");
+      document.getElementById("vminfo").innerHTML = formatNumber.new(myObj[x].vm, "$ ");
+      document.getElementById("v12hinfo").innerHTML = formatNumber.new(myObj[x].v12h, "$ ");
+      document.getElementById("v24hinfo").innerHTML = formatNumber.new(myObj[x].v24h, "$ ");
+      var apertura = myObj[x].ap;
+      var cierre = myObj[x].ci;
+      document.getElementById("horarioinfo").innerHTML = 'De ' + apertura.slice(0,5) + ' a ' + cierre.slice(0,5) + ' hs.';
+  }
+  
+  function borrarfiltros(){
+    if(fil==1){
+        fil=0;
+        function setMapOnAll(map) {
+              for (x in marcadores) {
+                marcadores[x].setMap(map);
+                }
+                marcadores =[];
+                infoventanas = [];
+          }
+          setMapOnAll(null);
+      for (x in myObj) {
+                if(myObj[x].gra == 1){
+                    //alert("yellow");
+                marcador = new google.maps.Marker({
+                position: new google.maps.LatLng(myObj[x].latitud, myObj[x].longitud),
+                map: map,
+                title: myObj[x].nombre,
+                icon: {url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
+              });
+                }else{
+                marcador = new google.maps.Marker({
+                position: new google.maps.LatLng(myObj[x].latitud, myObj[x].longitud),
+                map: map,
+                title: myObj[x].nombre,
+                icon: {url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+              });
+                }
+            alert("Success: " +myObj[x].latitud+" "+myObj[x].longitud);  
+            marcadores.push(marcador);
+              //	instancia una nueva ventana informativa
+              var ventanaInfo = new google.maps.InfoWindow();
+              var contenidoVentanaInfo =
+                              '<div class="info">' +
+                              '<span><h5>'+myObj[x].nombre+'</h5></span>' +
+                              '<div class="contenidoInfo">' +
+                              '<p>Hora: $'+myObj[x].vh+'</p>'+
+                              '<div class="d-flex">'+
+                              '<div class="d-flex-column">'+
+                              '<p>Abrir en:</p><a href="https://www.google.com/maps/search/?api=1&query='+myObj[x].latitud+','+myObj[x].longitud+'&query_place_id='+myObj[x].place+'" target="_blank">' +
+                              'Google Maps</a></span>' +
+                              '</div>'+
+                              '<button class="btn btn-success btn-sm" style="cursor:pointer;" onclick="infowindow('+x+');">+ Info</button>'+
+                              '</div>' +
+                              '</div>'+
+                              '</div>';
+              infoventanas.push(contenidoVentanaInfo);
+              google.maps.event.addListener(marcador, 'mouseover', (function(marcador, x) {
+                return function() {
+                  // establece el contenido de la ventana informativa
+                  ventanaInfo.setContent(infoventanas[x]),
+                    //abre la ventana informativa
+                    ventanaInfo.open(map, marcador);
+                }
+              })(marcador, x));
+          }
+    }
+  }
+  var myObj;
+  function filtrar(){
+        fil=1;
+        alert("filtrando..");
+        filtrosform.onsubmit = async (e) => {
+                e.preventDefault();
+        };
+               // if(myObj != undefined){
+        var formData = new FormData(filtrosform);
+                //var rango=formData.get('rango');
+                var rango=document.getElementById("myrange").value;
+                var vh=formData.get('vh');
+                var vm=formData.get('vm');
+                var v12h=formData.get('v12h');
+                var v24h=formData.get('v24h');
+                var auto=formData.get('auto');
+                var moto=formData.get('moto');
+                var pickup=formData.get('pickup');
+                var bici=formData.get('bici');
+                if(v12h==0){
+                  v12h=99000;
+                }
+                if(v24h==0){
+                  v24h=99000;
+                }
+                if(vm==0){
+                  vm=99000;
+                }
+                if(vh==0){
+                  vh=99000;
+                }
+                alert(vh+" "+vm+" "+v12h+" "+v24h);
+                if(myObj != undefined && myObj != null && marcadores.length !=0){
+                for (x in myObj){
+                    if(myObj[x].distance>rango || myObj[x].vh>vh || myObj[x].vm>vm || myObj[x].v12h>v12h || myObj[x].v24h>v24h){
+                        alert(myObj[x].nombre);
+                        alert(marcadores.length);
+                        marcadores[x].setMap(null);
+                    }else{
+                        marcadores[x].setMap(null);
+                        marcadores[x].setMap(map);
+                    }
+                }
+                }
+                //}
+
+  }
+  
+  function filtros(){
+      filtrosform.onsubmit = async (e) => {
+                e.preventDefault();
+        };
+      if(document.getElementById("opciones").style.display == "none"){
+        document.getElementById("opciones").style.display = "block";
+            var slider = document.getElementById("myrange");
+            var output = document.getElementById("rangovalor");
+            output.innerHTML = slider.value + "km";
+            slider.oninput = function() {
+              output.innerHTML = this.value + "km";
+            }
+      }else{
+        document.getElementById("opciones").style.display = "none";    
+      }
+  }
+
+      var marcadores= [];
+      var infoventanas = [];
+      function ya(latitud,longitud,z,f) {
+      var options = {
+         zoom: (12+z),
+         center: new google.maps.LatLng(latitud, longitud),
+         mapTypeId: google.maps.MapTypeId.ROADMAP,
+         mapTypeControl: false,
+      };
+      
+      map = new google.maps.Map(document.getElementById("gmap"), options);
+      
+      if(f==1){    
+          var xhttp = new XMLHttpRequest();
+          var marcador, x;
+          xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+          console.log(this.responseText);
+          myObj = JSON.parse(this.responseText);
+          console.log(myObj);
+          function setMapOnAll(map) {
+              for (x in marcadores) {
+                marcadores[x].setMap(map);
+                }
+                marcadores =[];
+                infoventanas = [];
+          }
+          setMapOnAll(null);
+          for (x in myObj) {
+                if(myObj[x].gra == 1){
+                    //alert("yellow");
+                marcador = new google.maps.Marker({
+                position: new google.maps.LatLng(myObj[x].latitud, myObj[x].longitud),
+                map: map,
+                title: myObj[x].nombre,
+                icon: {url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
+              });
+                }else{
+                marcador = new google.maps.Marker({
+                position: new google.maps.LatLng(myObj[x].latitud, myObj[x].longitud),
+                map: map,
+                title: myObj[x].nombre,
+                icon: {url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+                });
+                }
+            marcadores.push(marcador);
+              //	instancia una nueva ventana informativa
+              var ventanaInfo = new google.maps.InfoWindow();
+              var contenidoVentanaInfo =
+                              '<div>' +
+                              '<span><h4>'+myObj[x].nombre+'</h5></span>' +
+                              '<div class="mb-2" style="font-size: 12px;">De 08:00 hs a 20:00 hs<span class="ml-1" id="lug"></span></div>'+
+                              '<div style="width: 150px;">' +
+                              '<div class="mt-1 rounded" style="max-width:60%;"><div class="mx-1">Hora:'+formatNumber.new(myObj[x].vh, " $ ")+'</div></div>'+
+                              '<div class="mt-1 mb-3 rounded" style="max-width:60%;"><div class="mx-1">Mes: '+formatNumber.new(myObj[x].vm, " $ ")+'</div></div>'+
+                              '<div style="height:35px; width:150px; " class="d-flex">'+
+                              '<div class="d-flex-column">'+
+                              '<div>Abrir en:</div><div><a href="https://www.google.com/maps/search/?api=1&query='+myObj[x].latitud+','+myObj[x].longitud+'&query_place_id='+myObj[x].place+'" target="_blank">' +
+                              'Google Maps</a></div>' +
+                              '</div>'+
+                              '<button class="btn btn-success btn-sm ml-3" style="cursor:pointer;" onclick="infowindow('+x+');">+ Info</button>'+
+                              '</div>' +
+                              '</div>'+
+                              '</div>';
+              infoventanas.push(contenidoVentanaInfo);
+              google.maps.event.addListener(marcador, 'mouseover', (function(marcador, x) {
+                return function() {
+                  // establece el contenido de la ventana informativa
+                  ventanaInfo.setContent(infoventanas[x]),
+                    //abre la ventana informativa
+                    ventanaInfo.open(map, marcador);
+                }
+              })(marcador, x));
+              google.maps.event.addListener(marcador, 'click', (function(marcador, x) {
+                return function() {
+                  // establece el contenido de la ventana informativa
+                  ventanaInfo.setContent(infoventanas[x]),
+                    //abre la ventana informativa
+                    ventanaInfo.open(map, marcador);
+                }
+              })(marcador, x));
+
+          }
+
+          }
+          };
+          xhttp.open("POST", "playa.php", true);
+          xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          xhttp.send("latitud="+latitud+"&longitud="+longitud);
+      }
+      
+      var marker = new google.maps.Marker({
+         map: map,
+         position: new google.maps.LatLng(latitud, longitud),
+         draggable: true         
+         });
+      
+         google.maps.event.addListener(marker, "dragend", function () {
+          var pos= marker.getPosition();
+          //alert('soltado en LAT:'+pos.lat()+'LON:'+pos.lng());
+          ya(pos.lat(),pos.lng(),3,1);
+          var latitud = pos.lat();
+          var longitud = pos.lng();
+         });
+      }
+      
+
+</script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDrQIu0qaEDTCx5y-jCru-VNxP61yfsdJo"></script>
+
+
+</head>
+
+<body onload="ya(-31.41823194903026,-64.19009213359374,0,0)">
+ <div id="barra" class="container-fluid p-0">
+             <div class="row bg-dark no-gutters">       
+                        <div class="col">  
+                              <input type='text' id="dir" style="border-radius: 0px;" class="form-control" placeholder='Ingresa tu destino para encontrar estacionamientos cercanos o mueve el marcador en el mapa...' />
+                        </div>
+                   <button id="enviar" class="btn btn-success" style="border-radius: 0px; border-color:black;">Localizar</button>
+                   <button id="filtrar" onclick="filtros();" class="btn btn-warning" style="border-radius: 0px; border-color: black;">Filtrar</button>
+             </div>
+ </div>
+ <div style="position: relative;">
+     <div class="bg-warning" id="opciones" style="display:none; position: absolute; left: 0px; top:0px;  width:100%; z-index:3;">
+         
+         <form class="form-inline" id="filtrosform" style="border-bottom: 1px solid black;">
+             <div style="width:200px; height: 90px;">
+             <p class="mr-2 ml-2 mt-3 indigo-text" style="text-align: center; width:200px;">A una distancia de:<b><span style="width:45px; display:inline-block;" id="rangovalor" class="mr-2 ml-1"></span></b></p>
+             <div class="d-flex align-items-center ml-2">
+             <span class="font-weight-bold indigo-text ml-2 mr-2">0.2</span>
+             <input type="range" style="width:110px" class="custom-range mr-1" id="myrange" name="rango" min="0.20" max="2" step="0.1" value="1">
+             <span class="font-weight-bold indigo-text ml-1 mr-2">2</span>
+             </div>
+             </div>
+             <div style="min-width:200px; height: 90px;" class="d-flex-column">
+             <div class="d-flex justify-content-around  align-items-center" style="width:200px; height:45px;"> 
+             <label for="vh"><b>$HORA max:</b></label>
+             <input type="number" style="width:60px" class="form-control form-control-sm mr-1" id="vh" name="vh" min="0" max="999">
+             </div>
+             <div class="d-flex justify-content-around align-items-center" style="width:200px; height:45px;">
+             <label for="v12h"><b>$12HS max:</b></label>
+             <input type="number" style="width:60px" class="form-control form-control-sm mr-1" id="v12h" name="v12h" min="0" max="999">
+             </div>
+             </div>
+             <div style="min-width:200px; height: 90px;" class="d-flex-column">
+             <div class="d-flex justify-content-around align-items-center" style="width:200px; height:45px;">
+             <label for="vm"><b>$MES max:</b></label>
+             <input type="number" style="width:70px" class="form-control form-control-sm mr-1" id="vm" name="vm" min="0" max="9999">
+             </div>
+             <div class="d-flex justify-content-around align-items-center" style="width:200px; height:45px;">
+             <label for="v24h"><b>$24HS max:</b></label>
+             <input type="number" style="width:70px" class="form-control form-control-sm mr-1" id="v24h" name="v24h" min="0" max="9999">
+             </div>
+             </div>
+             <div style="min-width:170px; height: 90px;" class="d-flex-column align-items-start">
+             <div style="height:80px" class="d-flex-column ml-2 mt-2">
+                 <b>Únicamente para:</b>
+                 <div class="d-flex mt-1" style="width:160px">
+              <div class="mr-2 custom-control custom-checkbox">
+                <input onChange="comprobando1(this,1);" type="checkbox" class="custom-control-input" id="auto" name="auto">
+                <label class="custom-control-label" for="auto">Auto</label>
+             </div>
+              <div class="ml-2 custom-control custom-checkbox">
+                <input onChange="comprobando1(this,2);" type="checkbox" class="custom-control-input" id="pick" name="pick">
+                <label class="custom-control-label" for="pick">Pick-up</label>
+             </div>
+             </div>
+             <div class="d-flex" style="width:160px">
+             <div class="mr-2 custom-control custom-checkbox">
+                <input onChange="comprobando1(this,3);" type="checkbox" class="custom-control-input" id="moto" name="moto">
+                <label class="custom-control-label" for="moto">Moto</label>
+             </div>
+             <div class="ml-1 custom-control custom-checkbox">
+                <input onChange="comprobando1(this,4);" type="checkbox" class="custom-control-input" id="bici" name="bici">
+                <label class="custom-control-label" for="bici">Bici</label>
+             </div>
+             </div>
+             </div>
+             </div>
+             <div style="min-width:150px; height: 90px;" class="d-flex-column align-items-start">
+            <div style="height:80px" class="d-flex-column align-items-start ml-2">
+                 <div class="mr-2 custom-control custom-checkbox d-flex justify-content-start mt-2">
+                <input onChange="comprobando(this,0);" type="checkbox" class="custom-control-input" id="a24h" name="24">
+                <label class="custom-control-label" for="a24h"><b>Abierto 24hs</b></label>
+             </div>
+             <div class="mr-2 custom-control custom-checkbox d-flex justify-content-start">
+                <input onChange="comprobando2(this);" type="checkbox" class="custom-control-input" id="techado" name="techado">
+                <label class="custom-control-label" for="techado"><b>Techado</b></label>
+             </div>
+             <div class="mr-2 custom-control custom-checkbox d-flex justify-content-start">
+                <input onChange="comprobando3(this);" type="checkbox" class="custom-control-input" id="seguro" name="seguro">
+                <label class="custom-control-label" for="seguro"><b>Con seguro</b></label>
+             </div>
+             </div>
+             </div>
+             <div style="min-width:200px; height: 90px;" class="d-flex-column align-items-start">
+             <div style="height:80px;" class="d-flex-column align-items-start mt-1 ml-2 mt-2">
+                 <div class="d-flex justify-content-around">
+                 <label for="ha" class="mr-2 mt-2"><b>Apertura:</b></label>
+                 <input type="time" style="width:120px" class="form-control form-control-sm mr-2 ml-1" id="ha" name="ha" min="0" max="999.99">
+                 </div>
+                 <div class="d-flex justify-content-around">
+                 <label for="hc" class="mr-auto mt-2"><b>Cierre:</b></label>
+                 <input type="time" style="width:120px" class="form-control form-control-sm mr-2 mt-2" id="hc" name="hc" min="0" max="999.99">
+                 </div>
+             </div>
+             </div>
+              <div style="min-width:160px; height: 90px;" class="d-flex-column align-items-start">
+             <div class="d-flex-column mr-2 ml-2 mt-2">
+             <div class="mr-2 custom-control custom-checkbox d-flex justify-content-start">
+                <input onChange="comprobando(this,1);" type="checkbox" class="custom-control-input" id="solomen" name="solomen">
+                <label class="custom-control-label" for="solomen"><b>Solo Mensuales</b></label>
+             </div>
+             <div class="mr-2 custom-control custom-checkbox d-flex justify-content-start">
+                <input type="checkbox" disabled class="custom-control-input" id="haylugar" name="haylugar">
+                <label class="custom-control-label" for="haylugar"><b>Hay lugar</b></label>
+             </div>
+              <div class="mr-2 custom-control custom-checkbox d-flex justify-content-start">
+                <input onChange="comprobando4(this);" type="checkbox" class="custom-control-input" id="gra" name="gra">
+                <label class="custom-control-label" for="gra"><b>Gratuito</b></label>
+             </div>
+             </div>
+             </div>
+             <div style="height:90px; width:200px;" class="d-flex-column mr-2">
+             <button class="btn btn-primary ml-3 btn-sm mt-3" style="font-size: 12px;" onclick="filtros();">Ocultar Filtros</button>
+             <div class="d-flex mt-2">
+             <button onclick="filtrar();" class="btn btn-success btn-sm ml-3" style="font-size: 12px;">Aplicar Filtros</button>
+             <button class="btn btn-dark btn-sm ml-2" onclick="borrarfiltros();" style="font-size: 12px;">Borrar Filtros</button>
+             </div>
+             </div>
+             <!--</div>-->
+         </form>
+         
+     </div>
+     <div class="bg-info" id="infowindow" style=" display: none; position: absolute; left: 0px; top:91px; height:auto; min-width:250px; max-width:30%; z-index:2;">
+         <div class="close"><span class="cerrar float-right" onclick="cerrarinfowindow()"></span></div>
+         <h3 id="nombreinfo" class="ml-2 mt-1 text-light"></h3>
+         <div id="dis" style="font-size:12px;" class="ml-2 mb-1 text-light"></div>
+         <div style="font-size: 13px" class="ml-2 mt-1 mb-1 text-light">Abierto:<span class="ml-1" id="horarioinfo"></span></div>
+         <div class="font-weight-bold indigo-text" id="infodet">
+             <div>Auto Moto Pick-up Bici</div> 
+             <div id="autoinfo" style="background-color: #c1b467;">
+             <div class="d-flex-column" style="width:50%; border: 1px solid #c1b467">
+             <div class="d-flex justify-content-around rounded-right mt-1" style="background-color:#5b8f54; color:#e0ddd7">
+             <div class="text-center ml-1 font-weight-bold" style="font-size: 14px">Hora: </div>
+             <div><span class="d-block text-center mr-1" id="vhinfo" style="font-size: 14px"></span></div>
+             </div>
+             <div class="d-flex justify-content-around mt-2 rounded-right" style="background-color:#5b8f54; color:#e0ddd7">
+             <div class="text-center ml-1 font-weight-bold" style="font-size: 14px">Mes: </div>
+             <div><span class="d-block text-center mr-1" id="vminfo" style="font-size: 14px"></span></div>
+             </div>
+             <div class="d-flex justify-content-around mt-2 rounded-right" style="background-color:#5b8f54; color:#e0ddd7">
+             <div class="text-center ml-1 font-weight-bold" style="font-size: 14px">24hs: </div>
+             <div><span class="d-block text-center mr-1" id="v24hinfo" style="font-size: 14px"></span></div>
+             </div>
+             <div class="d-flex justify-content-around mt-2 mb-2 rounded-right" style="background-color:#5b8f54; color:#e0ddd7">
+             <div class="text-center ml-1 font-weight-bold" style="font-size: 14px">12hs: </div>
+             <div><span class="d-block text-center mr-1" id="v12hinfo" style="font-size: 14px"></span></div>
+             </div>
+             </div>
+             </div>
+             <div style="display: none" id="motoinfo">
+             <p>Por Hora: $<span id="vhmotoinfo"></span></p>
+             <p>Por Mes:  $<span id="vmmotoinfo"></span></p>
+             <p>12 Horas:  $<span id="v24hmotoinfo"></span></p>
+             <p>24 Horas:$<span id="v12hmotoinfo"></span></p>
+             </div>
+         </div>
+     </div>
+ </div>
+     <div style="z-index:1;" id="gmap">Cargando mapa...</div>
+ 
+ <div class="d-flex"><a href="PlayaRegistro/PlayaRegistro.html" target="_blank"><button class="btn btn-primary rounded-0 mr-auto">Registra tu playa!</button></a>
+     <a href="PlayaRegistro/PlayaRegistroGratis.html" target="_blank"><button class="btn btn-warning rounded-0 mr-auto">Registra un Free Park!</button></a> 
+ </div>
+
+</body>
+</html>

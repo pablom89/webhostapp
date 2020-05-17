@@ -1,0 +1,45 @@
+<html>
+<head>
+        <title>Parking-Now</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="entrada.js"></script>
+        <link rel="stylesheet" href="entrada.css">
+        <title>Parking Now</title>
+</head>
+<body>
+
+<h1><strong>Bienvenido a Parking-Now</strong></h1>
+
+<div class="wrapper fadeInDown">
+  
+  <div class="fadeIn first" style="width: 450px">
+      <a class="w-100" href="../ConductoresRegistro/Conductores.html">
+      <button class="btn btn-info text-white w-100 p-2" style="border-bottom-right-radius: 0px;
+      border-bottom-left-radius: 0px">Crear una cuenta / Registrarse</button></a>
+    </div>
+    
+  <div id="formContent">
+    <br>
+      <input type="text" id="patente" class="fadeIn second" name="patente" placeholder="Patente"><br>
+      <p id="demo1" style="color: red"></p>
+      <input type="text" id="conta" class="fadeIn third" name="conta" placeholder="Contraseña"><br>
+      <p id="demo2" style="color: red"></p>
+      <br>
+      <button onclick="control()" class="fadeIn fourth btn btn-info p-2 w-50">Ingresar</button><br><br>
+
+    <div id="formFooter">
+      <a href="#" style="text-decoration: none">Olvidaste tu contraseña?</a>
+    </div>
+
+  </div>
+  <br><br>
+  <div class="fadeIn fourth"><a class="w-100" href="../ConductoresRegistro/Conductores.html">
+      <button class="btn btn-light btn-sm text-black w-100">Volver</button></a></div>
+</div>
+
+</body>
+</html>
